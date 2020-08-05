@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import * as THREE from "three";
+import TWEEN from "@tweenjs/tween.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { bucket1Positions } from "./bucketsAnimations/bucket1Positions";
 
 export class App extends Component {
   componentDidMount() {
@@ -14,12 +16,6 @@ export class App extends Component {
       new THREE.MeshBasicMaterial({ color: 0xfffff, wireframe: true })
     );
 
-    const mesh = new THREE.Mesh(
-      new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshBasicMaterial({ color: 0xff4444, wireframe: true })
-    );
-
-    mesh.position.y += 1;
     meshFloor.rotation.x -= Math.PI / 2;
 
     const light = new THREE.PointLight(0x404040, 10, 30);
@@ -36,47 +32,48 @@ export class App extends Component {
 
     const loader = new GLTFLoader();
 
-    loader.load(
-      "./building/scene.gltf",
-      gltf => {
-        // ADD MODEL TO THE SCENE
-        const warehouseModel = gltf.scene.children[0];
-        warehouseModel.scale.set(0.02, 0.02, 0.02);
-        warehouseModel.position.set(-40, 0, 0);
+    const l1 = () =>
+      loader.load(
+        "./building/scene.gltf",
+        gltf => {
+          // ADD MODEL TO THE SCENE
+          const warehouseModel = gltf.scene.children[0];
+          warehouseModel.scale.set(0.02, 0.02, 0.02);
+          warehouseModel.position.set(-40, 0, 0);
 
-        console.log("dddd", warehouseModel);
+          scene.add(warehouseModel);
 
-        scene.add(warehouseModel);
+          renderer.render(scene, camera);
+        },
+        xhr => {
+          console.log(xhr);
+          console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+        },
 
-        renderer.render(scene, camera);
-      },
-      xhr => {
-        console.log(xhr);
-        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-      },
+        error => {
+          console.log(error);
+        }
+      );
 
-      error => {
-        console.log(error);
-      }
-    );
+    l1();
 
     loader.load(
       "./bucket/scene.gltf",
       gltf => {
         // ADD MODEL TO THE SCENEs
         const bucket = gltf.scene.children[0];
-        bucket.scale.set(0.2, 0.2, 0.2);
+        bucket.scale.set(0.3, 0.3, 0.3);
         bucket.position.set(-30, 5, -28);
-
-        console.log("bucket", bucket);
 
         scene.add(bucket);
 
         renderer.render(scene, camera);
 
-        setTimeout(() => {
-          console.log("dupa");
-        }, 6000);
+        // Position animation
+
+        bucket1Positions(bucket);
+
+        animate1();
       },
       xhr => {
         console.log(xhr);
@@ -93,10 +90,8 @@ export class App extends Component {
       gltf => {
         // ADD MODEL TO THE SCENEs
         const bucket2 = gltf.scene.children[0];
-        bucket2.scale.set(0.2, 0.2, 0.2);
+        bucket2.scale.set(0.3, 0.3, 0.3);
         bucket2.position.set(-20, 5, -28);
-
-        console.log("bucket", bucket2);
 
         scene.add(bucket2);
 
@@ -117,10 +112,8 @@ export class App extends Component {
       gltf => {
         // ADD MODEL TO THE SCENEs
         const bucket3 = gltf.scene.children[0];
-        bucket3.scale.set(0.2, 0.2, 0.2);
+        bucket3.scale.set(0.3, 0.3, 0.3);
         bucket3.position.set(-10, 5, -28);
-
-        console.log("bucket", bucket3);
 
         scene.add(bucket3);
 
@@ -141,10 +134,8 @@ export class App extends Component {
       gltf => {
         // ADD MODEL TO THE SCENEs
         const bucket4 = gltf.scene.children[0];
-        bucket4.scale.set(0.2, 0.2, 0.2);
-        bucket4.position.set(0, 5, -28);
-
-        console.log("bucket", bucket4);
+        bucket4.scale.set(0.3, 0.3, 0.3);
+        bucket4.position.set(0, 3, 0);
 
         scene.add(bucket4);
 
@@ -160,21 +151,17 @@ export class App extends Component {
       }
     );
 
-    scene.add(mesh);
     scene.add(meshFloor);
 
-    camera.position.set(10, player.height, -5);
-    camera.lookAt(new THREE.Vector3(0, player.height, 0));
+    camera.position.set(20, player.height, -24);
+    camera.lookAt(new THREE.Vector3(-20, player.height, 0));
 
-    const renderer = new THREE.WebGL1Renderer();
+    const renderer = new THREE.WebGL1Renderer({ antialias: true });
     renderer.setSize(1200, 720);
     document.body.appendChild(renderer.domElement);
 
     const animate = () => {
       requestAnimationFrame(animate);
-
-      mesh.rotation.x += 0.01;
-      mesh.rotation.y += 0.02;
 
       // Keyboard movement inputs
       if (keyboard[87]) {
@@ -229,6 +216,14 @@ export class App extends Component {
     const color = 0xffffff;
     const density = 0.02;
     scene.fog = new THREE.FogExp2(color, density);
+
+    function animate1(time) {
+      requestAnimationFrame(animate1);
+
+      TWEEN.update(time);
+
+      renderer.render(scene, camera);
+    }
   }
 
   render() {
