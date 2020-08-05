@@ -2,7 +2,13 @@ import React, { Component } from "react";
 import * as THREE from "three";
 import TWEEN from "@tweenjs/tween.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { bucket1Positions } from "./bucketsAnimations/bucket1Positions";
+
+import {
+  bucket1Positions,
+  bucket2Positions,
+  bucket3Positions,
+  bucket4Positions
+} from "./bucketsAnimations/bucket1Positions";
 
 export class App extends Component {
   componentDidMount() {
@@ -45,11 +51,6 @@ export class App extends Component {
 
           renderer.render(scene, camera);
         },
-        xhr => {
-          console.log(xhr);
-          console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-        },
-
         error => {
           console.log(error);
         }
@@ -57,99 +58,55 @@ export class App extends Component {
 
     l1();
 
-    loader.load(
-      "./bucket/scene.gltf",
-      gltf => {
-        // ADD MODEL TO THE SCENEs
-        const bucket = gltf.scene.children[0];
-        bucket.scale.set(0.3, 0.3, 0.3);
-        bucket.position.set(-30, 5, -28);
-
-        scene.add(bucket);
-
-        renderer.render(scene, camera);
-
-        // Position animation
-
-        bucket1Positions(bucket);
-
-        animate1();
+    const bucketsInitialPositions = [
+      {
+        positions: { x: -30, y: 5, z: -28 },
+        animations: bucket1Positions
       },
-      xhr => {
-        console.log(xhr);
-        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+      {
+        positions: { x: -20, y: 5, z: -28 },
+        animations: bucket2Positions
       },
-
-      error => {
-        console.log(error);
+      {
+        positions: { x: -10, y: 5, z: -28 },
+        animations: bucket3Positions
+      },
+      {
+        positions: { x: 0, y: 5, z: -28 },
+        animations: bucket4Positions
       }
-    );
+    ];
 
-    loader.load(
-      "./bucket/scene.gltf",
-      gltf => {
-        // ADD MODEL TO THE SCENEs
-        const bucket2 = gltf.scene.children[0];
-        bucket2.scale.set(0.3, 0.3, 0.3);
-        bucket2.position.set(-20, 5, -28);
+    const renderBuckets = () => {
+      bucketsInitialPositions.map(bucketInitial =>
+        loader.load(
+          "./bucket/scene.gltf",
+          gltf => {
+            // ADD MODEL TO THE SCENEs
+            const bucket = gltf.scene.children[0];
+            bucket.scale.set(0.3, 0.3, 0.3);
+            bucket.position.set(
+              bucketInitial.positions.x,
+              bucketInitial.positions.y,
+              bucketInitial.positions.z
+            );
 
-        scene.add(bucket2);
+            scene.add(bucket);
 
-        renderer.render(scene, camera);
-      },
-      xhr => {
-        console.log(xhr);
-        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-      },
+            renderer.render(scene, camera);
 
-      error => {
-        console.log(error);
-      }
-    );
+            bucketInitial.animations && bucketInitial.animations(bucket);
 
-    loader.load(
-      "./bucket/scene.gltf",
-      gltf => {
-        // ADD MODEL TO THE SCENEs
-        const bucket3 = gltf.scene.children[0];
-        bucket3.scale.set(0.3, 0.3, 0.3);
-        bucket3.position.set(-10, 5, -28);
+            animate1();
+          },
+          error => {
+            console.log(error);
+          }
+        )
+      );
+    };
 
-        scene.add(bucket3);
-
-        renderer.render(scene, camera);
-      },
-      xhr => {
-        console.log(xhr);
-        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-      },
-
-      error => {
-        console.log(error);
-      }
-    );
-
-    loader.load(
-      "./bucket/scene.gltf",
-      gltf => {
-        // ADD MODEL TO THE SCENEs
-        const bucket4 = gltf.scene.children[0];
-        bucket4.scale.set(0.3, 0.3, 0.3);
-        bucket4.position.set(0, 3, 0);
-
-        scene.add(bucket4);
-
-        renderer.render(scene, camera);
-      },
-      xhr => {
-        console.log(xhr);
-        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-      },
-
-      error => {
-        console.log(error);
-      }
-    );
+    renderBuckets();
 
     scene.add(meshFloor);
 
