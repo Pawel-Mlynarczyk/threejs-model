@@ -60,27 +60,31 @@ export class App extends Component {
 
     const bucketsInitialPositions = [
       {
+        bucketModel: "./bucket/scene.gltf",
         positions: { x: -30, y: 5, z: -28 },
         animations: bucket1Positions
       },
       {
-        positions: { x: -20, y: 5, z: -28 },
-        animations: bucket2Positions
+        bucketModel: "./bucket2/scene.gltf",
+        positions: { x: -20, y: 5, z: -28 }
+        // animations: bucket2Positions
       },
       {
-        positions: { x: -10, y: 5, z: -28 },
-        animations: bucket3Positions
+        bucketModel: "./bucket3/scene.gltf",
+        positions: { x: -10, y: 5, z: -28 }
+        // animations: bucket3Positions
       },
       {
-        positions: { x: 0, y: 5, z: -28 },
-        animations: bucket4Positions
+        bucketModel: "./bucket4/scene.gltf",
+        positions: { x: 0, y: 5, z: -28 }
+        // animations: bucket4Positions
       }
     ];
 
     const renderBuckets = () => {
       bucketsInitialPositions.map(bucketInitial =>
         loader.load(
-          "./bucket/scene.gltf",
+          bucketInitial.bucketModel,
           gltf => {
             // ADD MODEL TO THE SCENEs
             const bucket = gltf.scene.children[0];
@@ -110,8 +114,8 @@ export class App extends Component {
 
     scene.add(meshFloor);
 
-    camera.position.set(20, player.height, -24);
-    camera.lookAt(new THREE.Vector3(-20, player.height, 0));
+    camera.position.set(20, player.height, -28);
+    camera.lookAt(new THREE.Vector3(-15, player.height, 0));
 
     const renderer = new THREE.WebGL1Renderer({ antialias: true });
     renderer.setSize(1200, 720);
