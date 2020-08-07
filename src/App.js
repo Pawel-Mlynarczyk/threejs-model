@@ -8,14 +8,20 @@ import {
   bucket2Positions,
   bucket3Positions,
   bucket4Positions
-} from "./bucketsAnimations/bucket1Positions";
+} from "./bucketsAnimations/bucketsPositions";
+import {
+  workerPositions,
+  worker2Positions,
+  worker3Positions,
+  worker4Positions
+} from "./bucketsAnimations/workersPositions";
 
 export class App extends Component {
   componentDidMount() {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, 1200 / 720, 0.1, 1000);
     var keyboard = {};
-    const player = { height: 10, speed: 0.2, turnSpeed: Math.PI * 0.2 };
+    const player = { height: 10, speed: 0.4, turnSpeed: Math.PI * 0.2 };
 
     const meshFloor = new THREE.Mesh(
       new THREE.PlaneGeometry(110, 150, 50, 100),
@@ -51,6 +57,7 @@ export class App extends Component {
 
           renderer.render(scene, camera);
         },
+        undefined,
         error => {
           console.log(error);
         }
@@ -103,6 +110,7 @@ export class App extends Component {
 
             animate1();
           },
+          undefined,
           error => {
             console.log(error);
           }
@@ -111,6 +119,70 @@ export class App extends Component {
     };
 
     renderBuckets();
+
+    const workersInitialPositions = [
+      {
+        positions: { x: -25, y: 1.8, z: -20 },
+        animations: workerPositions,
+        initialRotation: 4,
+        rotationDelay: 9000,
+        secondRotation: 10
+      },
+      {
+        positions: { x: -30, y: 1.8, z: -5 },
+        animations: worker2Positions,
+        initialRotation: 1.5
+      },
+      {
+        positions: { x: 20, y: 1.8, z: -15 },
+        animations: worker3Positions,
+        initialRotation: 4.5,
+        rotationDelay: 45000,
+        secondRotation: 3
+      },
+      {
+        positions: { x: -35, y: 1.8, z: -15 },
+        animations: worker4Positions,
+        initialRotation: 1.5,
+        rotationDelay: 22000,
+        secondRotation: 3
+      }
+    ];
+
+    const renderWorkers = () =>
+      workersInitialPositions.map(workerInitial =>
+        loader.load(
+          "./maleWorker/scene.gltf",
+          gltf => {
+            const worker = gltf.scene.children[0];
+            worker.scale.set(1.5, 1.5, 1.5);
+            worker.position.set(
+              workerInitial.positions.x,
+              workerInitial.positions.y,
+              workerInitial.positions.z
+            );
+            worker.rotation.z += workerInitial.initialRotation;
+
+            workerInitial.rotationDelay &&
+              setTimeout(() => {
+                worker.rotation.z += workerInitial.secondRotation;
+              }, workerInitial.rotationDelay);
+            scene.add(worker);
+
+            renderer.render(scene, camera);
+
+            workerInitial.animations(worker);
+
+            animate1();
+          },
+          undefined,
+          error => {
+            console.log(error);
+          }
+        )
+      );
+
+    renderWorkers();
 
     scene.add(meshFloor);
 
